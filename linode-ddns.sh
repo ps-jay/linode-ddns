@@ -27,6 +27,9 @@ else
     LOOPTIME=${SLEEPTIME}
 fi
 
+# It's handy to know it all works first time though
+FIRSTEXEC="true"
+
 # Main loop
 while true ; do
 
@@ -55,6 +58,12 @@ while true ; do
         echo "${DATE}: '${PUBLICIP}' not a valid looking IP"
         sleep ${LOOPTIME}
         continue
+    fi
+
+    if [[ ${FIRSTEXEC} == "true" ]] ; then
+        echo "Current DNS record: ${CURRENT}"
+        echo "Current public IP : ${PUBLICIP}"
+        FIRSTEXEC="false"
     fi
 
     if [[ ${CURRENT} != ${PUBLICIP} ]] ; then
