@@ -1,22 +1,21 @@
-FROM alpine:3.2
+FROM python:3
 
 MAINTAINER Philip Jay <phil@jay.id.au>
 
 ENV TZ Australia/Melbourne
 
-RUN apk update \
- && apk upgrade \
- && apk add \
-      bash \
-      openssl \
- && rm -rf /var/cache/apk/*
+ADD requirements.txt /tmp/
 
-ADD linode-ddns.sh /opt/
+RUN pip install -U \
+      -r /tmp/requirements.txt \
+ && rm -rf /root/.cache
 
-RUN chmod a+rx /opt/linode-ddns.sh
+ADD pylint.conf     /tmp/
+ADD route53_ddns.py /app/
 
-RUN adduser -H -S linode-ddns
+RUN adduser --system route53_ddns
+USER route53_ddns
 
-USER linode-ddns
+RUN pylint --rcfile /tmp/pylint.conf /app/route53_ddns.py
 
-CMD [ "/opt/linode-ddns.sh" ]
+CMD python /app/route53_ddns.py
